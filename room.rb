@@ -2,10 +2,10 @@ require_relative 'object'
 
 class Room
   attr_reader :id
-  attr_reader :title
-  attr_reader :short_desc
-  attr_reader :long_desc
-  attr_reader :items
+  attr_accessor :title
+  attr_accessor :short_desc
+  attr_accessor :long_desc
+  attr_accessor :items
 
   def initialize(id, title, short_desc, long_desc)
     @items = []

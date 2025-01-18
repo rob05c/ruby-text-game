@@ -2,6 +2,8 @@ require_relative 'idgen'
 require_relative 'player'
 
 class World
+  attr_accessor :rooms
+
   def initialize
     print("creating new world\n")
     @id_generator = IdGenerator.new
@@ -44,7 +46,7 @@ class World
     return {} unless @room_links.key?(room)
 
     @room_links[room]
- end
+  end
 
   def get_room_link(room, direction)
     return nil unless @room_links.key?(room) # TODO: invalid direction enum?

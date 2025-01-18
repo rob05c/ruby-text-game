@@ -102,6 +102,9 @@ cup = Object.new(world.new_id, 'cup', 'an ornate silver cup', 'This cup is very 
 player.add_item(sword)
 player.add_item(cup)
 
+world_key = make_world_key(world)
+player.add_item(world_key)
+
 # msg = look(world, player, ['look'])
 # puts "look: #{msg}"
 

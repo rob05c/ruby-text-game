@@ -30,9 +30,34 @@ def base_commands
     'move' => method(:move),
     'drop' => method(:drop),
     'get' => method(:get),
+
     'i' => method(:inventory),
     'inv' => method(:inventory),
-    'inventory' => method(:inventory)
+    'inventory' => method(:inventory),
+
+    'w' => ->(world, player, args) { go(world, player, Direction::WEST) },
+    'west' => ->(world, player, args) { go(world, player, Direction::WEST) },
+    'e' => ->(world, player, args) { go(world, player, Direction::EAST) },
+    'east' => ->(world, player, args) { go(world, player, Direction::EAST) },
+    'n' => ->(world, player, args) { go(world, player, Direction::NORTH) },
+    'north' => ->(world, player, args) { go(world, player, Direction::NORTH) },
+    's' => ->(world, player, args) { go(world, player, Direction::SOUTH) },
+    'south' => ->(world, player, args) { go(world, player, Direction::SOUTH) },
+    'ne' => ->(world, player, args) { go(world, player, Direction::NORTH_EAST) },
+    'northeast' => ->(world, player, args) { go(world, player, Direction::NORTH_EAST) },
+    'nw' => ->(world, player, args) { go(world, player, Direction::NORTH_WEST) },
+    'northwest' => ->(world, player, args) { go(world, player, Direction::NORTH_WEST) },
+    'sw' => ->(world, player, args) { go(world, player, Direction::SOUTH_WEST) },
+    'southwest' => ->(world, player, args) { go(world, player, Direction::SOUTH_WEST) },
+    'se' => ->(world, player, args) { go(world, player, Direction::SOUTH_WEST) },
+    'southeast' => ->(world, player, args) { go(world, player, Direction::SOUTH_EAST) },
+
+    'poke' => method(:interaction),
+    'push' => method(:interaction),
+    'pull' => method(:interaction),
+    'turn' => method(:interaction),
+    'spin' => method(:interaction)
+
   }
 end
 
@@ -77,6 +102,12 @@ def move(world, player, args)
   direction = Direction.from_str(direction_str)
   return 'You wiggle about.' if direction.nil?
 
+  go(world, player, direction)
+end
+
+# go moves player in dir.
+# This is a utility func, not a command, i.e. it doesn't conform to func(world,player,args).
+def go(world, player, direction)
   room = player.room
 
   new_room = world.get_room_link(room, direction)
@@ -149,4 +180,35 @@ end
 
 def unknown_command(world, player, args)
   'What was that now?'
+end
+
+# interaction is a generic command for interaction commands with objects:
+# push, pull, poke, etc.
+# It searches the player's inventory, then the room, for items with the given word.
+def interaction(world, player, args)
+  verb = args[0].strip.downcase
+  return "What do you want to #{verb}?" if args.length < 2
+
+  noun = args[1]
+  obj = nil
+  # TODO: put in a "get_player_obj(word)" func
+  player.carrying.each do |pobj|
+    if pobj.word == noun
+      obj = pobj
+      break
+    end
+  end
+
+  if obj.nil?
+    player.room.items.each do |robj|
+      if robj.word == noun
+        obj = robj
+        break
+      end
+    end
+  end
+
+  return "You don't see a #{noun} to #{verb}." if obj.nil?
+
+  obj.cmd.call(world, player, args)
 end

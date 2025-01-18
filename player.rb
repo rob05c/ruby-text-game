@@ -88,6 +88,14 @@ class Player
     "You pick up #{obj.brief_desc}."
   end
 
+  def carrying?(obj)
+    # TODO: de-duplicate with drop etc?
+    @carrying.each do |cobj|
+      return true if cobj.id == obj.id
+    end
+    false
+  end
+
   ##
   # Low-level func to add an item directly.
   # Returns no message, and has no checks or removal from anywhere else.
