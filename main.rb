@@ -8,8 +8,8 @@ require_relative 'command'
 require_relative 'direction'
 
 def repl(world, player)
+  player.send_prompt # send initial prompt
   loop do
-    send(player.prompt)
     input = read
     return false if repl_eval(world, player, input)
   end
@@ -24,24 +24,30 @@ end
 #
 # returns whether to stop the repl loop and quit the game.
 def repl_eval(world, player, msg)
+  player.processing = true
+
   # TODO: add sanitisation function
   msg = msg.strip
 
   # if the user just hit enter with no text (or only whitespace), just print a prompt
-  return false if msg == ''
+  if msg == ''
+    player.send('')
+    return false
+  end
 
   # lmsg = msg.lower()
   lmsg = msg.tr('  ', ' ')
   args = lmsg.split(' ')
 
   if args.length == 0
+    player.send('')
     return false # just send another prompt
   end
 
   # TODO: integrate with command module?
   arg0 = args[0]
   if (arg0 == 'quit') || (arg0 == 'exit') || (arg0 == 'q')
-    send("Goodbye!\n")
+    player.send("Goodbye!\n")
     return true
   end
 
@@ -49,20 +55,10 @@ def repl_eval(world, player, msg)
 
   # TODO: pass parameter for writing to user? or make send a member of world?
 
-  msg = cmd.call(world, player, args)
-
-  send(msg + "\n")
+  cmd.call(world, player, args)
   false
-end
-
-# Sends msg to the user.
-#
-# Right now, this just prints. But we want to be able to easily find + replace
-# all user prints in the future, e.g. to support multiple users, telnet, ssh, etc.
-#
-# Does not automatically send a newline, to allow for prompts. Most calls besides prompts should send a newline
-def send(msg)
-  print msg
+ensure
+  player.end_processing_and_send
 end
 
 ii = IdGenerator.new

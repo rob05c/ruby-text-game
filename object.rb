@@ -4,6 +4,13 @@ class Object
   attr_accessor :brief_desc
   attr_accessor :long_desc
 
+  # on_before_get takes a (world, player, obj) and returns a disallow message string
+  # If the returned string is empty, getting is allowed.
+  attr_accessor :on_before_get
+
+  # on_after_get takes a (world, player, obj) and returns nothing.
+  attr_accessor :on_after_get
+
   # cmd is a command called when the player interacts with the object via standard commands
   # e.g. push, pull, poke, etc.
   # It's a regular command func, i.e. it's passed the world, player, and args the player typed
@@ -23,7 +30,7 @@ def object_cmd_default(object, world, player, args)
   cmd = args[0]
   cmd = cmd.strip.downcase
 
-  "You #{cmd} the #{@word}, but nothing seems to happen."
+  player.send("You #{cmd} the #{@word}, but nothing seems to happen.")
 end
 
 class Weapon < Object
@@ -59,6 +66,17 @@ end
 def make_world_key(world)
   obj = Object.new(world.new_id, 'key', 'an unobtrusive key', 'This unremarkable key seems to be made of iron.')
   obj.cmd = ->(world, player, args) { world_key_cmd(obj, world, player, args) }
+
+  # world keys cannot be picked up off the ground
+  obj.on_before_get = lambda { |world, player, object|
+    player.send('You feel anxious.')
+    disallow_msg = ''
+    disallow_msg
+  }
+  obj.on_after_get = lambda { |world, player, object|
+    player.send('You are filled with a sense of forboding.') # send separately after the next prompt
+  }
+
   obj
 end
 
@@ -67,14 +85,20 @@ def world_key_cmd(key, world, player, args)
 
   player_is_carrying = player.carrying?(key)
 
-  return 'The key shimmers slightly.' unless player_is_carrying
+  unless player_is_carrying
+    player.send('The key shimmers slightly.')
+    return
+  end
 
-  return 'The key glistens.' if verb != 'turn'
+  if verb != 'turn'
+    player.send('The key glistens.')
+    return
+  end
 
   room_obj = make_room_obj(world)
   player.carrying.push(room_obj)
 
-  'The key glows in your hands, and you suddenly find the end of the key inserted into an inexplicable fragment of reality which you now hold.'
+  player.send('The key glows in your hands, and you suddenly find the end of the key inserted into an inexplicable fragment of reality which you now hold.')
 end
 
 # RoomItem is a room item, used to create new rooms via a world key.
@@ -93,51 +117,65 @@ class RoomItem < Object
     verb = args[0].strip.downcase
 
     if verb == 'spin'
-      return "The #{@word} spins in place, but the current location rejects it." if args.length < 3
+      if args.length < 3
+        player.send("The #{@word} spins in place, but the current location rejects it.")
+        return
+      end
 
       direction_str = args[2].strip.downcase
       direction = Direction.from_str(direction_str)
 
       if direction.nil?
-        return "The #{@word} spins #{direction_str}, but the universe feels you aren't ready for that direction yet."
+        player.send("The #{@word} spins #{direction_str}, but the universe feels you aren't ready for that direction yet.")
+        return
       end
 
       if (@room.title == '') || (@room.short_desc == '') || (@room.long_desc == '')
-        return "The #{@word} spins briefly and falls over."
+        player.send("The #{@word} spins briefly and falls over.")
+        return
       end
 
       room = player.room
       existing_room = world.get_room_link(room, direction)
-      return "The #{@word} spins to the #{direction_str}, but the existing fabric rejects it." unless existing_room.nil?
+      unless existing_room.nil?
+        player.send("The #{@word} spins to the #{direction_str}, but the existing fabric rejects it.")
+        return
+      end
 
       world.rooms[room.id] = @room
       world.link_rooms(room, direction, @room)
       player.carrying.delete(self)
 
-      return "The #{@word} spins into the fabric of the universe."
-
+      player.send("The #{@word} spins into the fabric of the universe.")
+      return
     end
 
-    return "The #{@word} of reality bristles." if verb != 'push'
+    if verb != 'push'
+      player.send("The #{@word} of reality bristles.")
+      return
+    end
 
-    return "The #{@word} of reality stares at you awkwardly." if args.length < 3
+    if args.length < 3
+      player.send("The #{@word} of reality stares at you awkwardly.")
+      return
+    end
 
     desc = args.slice(2, args.length)
     desc = desc.join(' ').strip
 
-    puts "DEBUG roc '#{@room.title}' '#{@room.short_desc}' '#{@room.long_desc}'"
+    # puts "DEBUG roc '#{@room.title}' '#{@room.short_desc}' '#{@room.long_desc}'"
 
     if @room.title == ''
       @room.title = desc
-      "The #{@word} ripples takes on form."
+      player.send("The #{@word} ripples takes on form.")
     elsif @room.short_desc == ''
       @room.short_desc = desc
-      "The #{@word} ripples takes on shape."
+      player.send("The #{@word} ripples takes on shape.")
     elsif @room.long_desc == ''
       @room.long_desc = desc
-      "The #{@word} ripples takes on meaning."
+      player.send("The #{@word} ripples takes on meaning.")
     else
-      "The #{@word} shudders with potential."
+      player.send("The #{@word} shudders with potential.")
     end
   end
 end

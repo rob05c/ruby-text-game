@@ -91,16 +91,21 @@ def look(world, player, args)
   room = player.room
   ris = room_items_str(world, room)
   rds = room_directions_str(world, room)
-  msg = "#{room.title}\n\n#{room.short_desc}\n#{ris}\n#{rds}"
-  msg
+  player.send("#{room.title}\n\n#{room.short_desc}\n#{ris}\n#{rds}")
 end
 
 def move(world, player, args)
-  return 'Where do you want to go?' if args.length < 2
+  if args.length < 2
+    player.send('Where do you want to go?')
+    return
+  end
 
   direction_str = args[1]
   direction = Direction.from_str(direction_str)
-  return 'You wiggle about.' if direction.nil?
+  if direction.nil?
+    player.send('You wiggle about.')
+    return
+  end
 
   go(world, player, direction)
 end
@@ -111,18 +116,22 @@ def go(world, player, direction)
   room = player.room
 
   new_room = world.get_room_link(room, direction)
-  return 'The way is shut.' if new_room.nil?
+  if new_room.nil?
+    player.send('The way is shut.')
+    return
+  end
 
   player.room = new_room
 
   # TODO: make auto-look-on-move configurable?
-  msg = look(world, player, [])
-
-  msg
+  look(world, player, [])
 end
 
 def drop(world, player, args)
-  return 'What do you want to drop?' if args.length < 2
+  if args.length < 2
+    player.send('What do you want to drop?')
+    return
+  end
 
   item_str = args[1]
   item_str = item_str.strip.downcase
@@ -135,13 +144,20 @@ def drop(world, player, args)
     item = player_item
     break
   end
-  return "You aren't carrying a #{item_str}." if item.nil?
+
+  if item.nil?
+    player.send("You aren't carrying a #{item_str}.")
+    return
+  end
 
   player.drop(item)
 end
 
 def get(world, player, args)
-  return 'What do you want to get?' if args.length < 2
+  if args.length < 2
+    player.send('What do you want to get?')
+    return
+  end
 
   item_str = args[1]
   item_str = item_str.strip.downcase
@@ -155,9 +171,12 @@ def get(world, player, args)
     break
   end
 
-  return "You don't see a #{item_str} here." if item.nil?
+  if item.nil?
+    player.send("You don't see a #{item_str} here.")
+    return
+  end
 
-  player.get(item)
+  player.get(world, item)
 end
 
 def inventory(world, player, args)
@@ -167,7 +186,7 @@ def inventory(world, player, args)
   end
 
   item_str = item_strs.join(', ')
-  "You are carrying #{item_str}."
+  player.send("You are carrying #{item_str}.")
 end
 
 # no_command is used when the player sends just a return or whitespace.
@@ -175,11 +194,11 @@ end
 
 # This is distinct from the player entering an unknown command.
 def no_command(world, player, args)
-  ''
+  nil
 end
 
 def unknown_command(world, player, args)
-  'What was that now?'
+  player.send('What was that now?')
 end
 
 # interaction is a generic command for interaction commands with objects:
@@ -187,7 +206,10 @@ end
 # It searches the player's inventory, then the room, for items with the given word.
 def interaction(world, player, args)
   verb = args[0].strip.downcase
-  return "What do you want to #{verb}?" if args.length < 2
+  if args.length < 2
+    player.send("What do you want to #{verb}?")
+    return
+  end
 
   noun = args[1]
   obj = nil
@@ -208,7 +230,10 @@ def interaction(world, player, args)
     end
   end
 
-  return "You don't see a #{noun} to #{verb}." if obj.nil?
+  if obj.nil?
+    player.send("You don't see a #{noun} to #{verb}.")
+    return
+  end
 
   obj.cmd.call(world, player, args)
 end
