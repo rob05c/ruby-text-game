@@ -188,11 +188,11 @@ class Player
     #      It's fine at this point for another thread to add to the queue, it'll just result in the player getting another prompt.
     #      But it's not fine if they send a message to the player out-of-order
 
-    send_queue(queue)
+    do_send_queue(queue)
   end
 
   # send_queue sends the queue to the player, line-by-line, followed by a prompt.
-  def send_queue(queue)
+  def do_send_queue(queue)
     # real_send("\n") if queue.length > 0
 
     queue.each do |msg|

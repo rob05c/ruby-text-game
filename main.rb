@@ -6,6 +6,7 @@ require_relative 'object'
 require_relative 'room'
 require_relative 'command'
 require_relative 'direction'
+require_relative 'events'
 
 def repl(world, player)
   player.send_prompt # send initial prompt
@@ -103,5 +104,14 @@ player.add_item(world_key)
 
 # msg = look(world, player, ['look'])
 # puts "look: #{msg}"
+
+eq = EventQueue.new
+eq.start
+
+# debug
+# eq.add_event(Time.now + 5, -> { puts 'event-05' })
+# eq.add_event(Time.now + 10, -> { puts 'event-10' })
+# eq.add_event(Time.now + 7, -> { puts 'event-07' })
+# eq.add_event(Time.now + 2, -> { puts 'event-02' })
 
 repl(world, player)
