@@ -34,26 +34,36 @@ class EventQueue
   # TODO make private?
   def run
     loop do
-      @lock.synchronize do
+      @lock.lock
+      event_to_fire = nil
+      begin
         return if @stop # if the EventQueue was stopped, stop the run
 
-        Thread.stop if @heap.size == 0 # if the event queue is empty, pause the thread until an event is added
+        if @heap.size == 0 # if the event queue is empty, pause the thread until an event is added
+          @lock.unlock
+          Thread.stop
+          next
+        end
 
         next_event = @heap.min
         time_until_s = next_event.time - Time.now
         if time_until_s > 0
-          @lock.sleep(time_until_s)
+          @lock.unlock
+          sleep(time_until_s)
           # loop again, because new events may have been added
           next
         end
 
-        puts "DEBUG calling time_until_s #{time_until_s}"
-
         # time was after the current time, so process it
 
-        next_event = @heap.pop # actually remove it from the heap
-        next_event.fn.call
+        event_to_fire = @heap.pop # actually remove it from the heap
+      ensure
+        # TODO: rework locking, it's very unsafe
+        @lock.unlock if @lock.locked?
       end
+
+      # fire after unlocking, so the call takes place without holding the EventQueue lock
+      event_to_fire.fn.call # will be nil if synchronize block called next
     end
 
     puts 'hello from thread'
@@ -71,8 +81,8 @@ class EventQueue
   def add_event(time, fn)
     @lock.synchronize do
       @heap.push(EventQueueObj.new(time, fn))
-      @thread.wakeup
     end
+    @thread.wakeup # wake up the event thread, in case it was sleeping if there were no events
   end
 end
 

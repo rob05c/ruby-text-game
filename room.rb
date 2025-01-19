@@ -8,6 +8,7 @@ class Room
   attr_accessor :items
 
   def initialize(id, title, short_desc, long_desc)
+    # TODO: change to set? iterating over a lot of items would be slow, but do we expect thousands of item?
     @items = []
     @id = id
     @title = title
@@ -23,4 +24,15 @@ class Room
   def add_item(obj)
     @items.push(obj)
   end
+
+  def has_item?(obj)
+    @items.each do |room_item|
+      return true if room_item == obj
+
+      return false
+    end
+    false # false if the room had no items
+  end
+
+  # TODO: add room remove item, and events
 end

@@ -44,7 +44,6 @@ class Player
   alias processing? processing
 
   def initialize(id, name, room)
-    @carrying = []
     @id = id
     @room = room
     @health = 100
@@ -93,7 +92,7 @@ class Player
     "You put #{obj.brief_desc} away."
   end
 
-  def drop(obj)
+  def drop(world, obj)
     # TODO: de-duplicate with wield
     is_carrying = false
     @carrying.each do |cobj|
@@ -107,10 +106,18 @@ class Player
       return
     end
 
+    unless obj.on_before_move.nil?
+      disallow_msg = obj.on_before_move.call(world, @room, obj)
+      if disallow_msg != ''
+        send(disallow_msg)
+        return
+      end
+    end
     @carrying.delete(obj)
     @room.add_item(obj)
 
     send("You drop #{obj.brief_desc} on the ground.")
+    obj.on_after_move&.call(world, @room, obj)
   end
 
   def get(world, obj)
@@ -128,8 +135,8 @@ class Player
       return
     end
 
-    unless obj.on_before_get.nil?
-      disallow_msg = obj.on_before_get.call(world, self, obj)
+    unless obj.on_before_move.nil?
+      disallow_msg = obj.on_before_move.call(world, self, obj)
       if disallow_msg != ''
         send(disallow_msg)
         return
@@ -139,7 +146,7 @@ class Player
     @carrying.push(obj)
     @room.items.delete(obj)
     send("You pick up #{obj.brief_desc}.")
-    obj.on_after_get&.call(world, self, obj)
+    obj.on_after_move&.call(world, self, obj)
   end
 
   def carrying?(obj)
@@ -168,7 +175,7 @@ class Player
 
     # TODO: lock, if made parallel
     if !processing?
-      send_queue([msg])
+      do_send_queue([msg])
     else
       @send_queue.append(msg)
     end

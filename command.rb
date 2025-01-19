@@ -28,7 +28,10 @@ def base_commands
     'l' => method(:look),
     'go' => method(:move),
     'move' => method(:move),
+
+    'd' => method(:drop),
     'drop' => method(:drop),
+    'g' => method(:get),
     'get' => method(:get),
 
     'i' => method(:inventory),
@@ -150,7 +153,7 @@ def drop(world, player, args)
     return
   end
 
-  player.drop(item)
+  player.drop(world, item)
 end
 
 def get(world, player, args)

@@ -4,12 +4,14 @@ class Object
   attr_accessor :brief_desc
   attr_accessor :long_desc
 
-  # on_before_get takes a (world, player, obj) and returns a disallow message string
+  # on_before_move takes a (world, location, obj) and returns a disallow message string
   # If the returned string is empty, getting is allowed.
-  attr_accessor :on_before_get
+  # The location may be a player, room, or potentially other types in the future.
+  attr_accessor :on_before_move
 
-  # on_after_get takes a (world, player, obj) and returns nothing.
-  attr_accessor :on_after_get
+  # on_after_move takes a (world, location, obj) and returns nothing.
+  # The location may be a player, room, or potentially other types in the future.
+  attr_accessor :on_after_move
 
   # cmd is a command called when the player interacts with the object via standard commands
   # e.g. push, pull, poke, etc.
@@ -68,12 +70,18 @@ def make_world_key(world)
   obj.cmd = ->(world, player, args) { world_key_cmd(obj, world, player, args) }
 
   # world keys cannot be picked up off the ground
-  obj.on_before_get = lambda { |world, player, object|
+  obj.on_before_move = lambda { |world, location, object|
+    return '' unless location.is_a?(Player)
+
+    player = location
     player.send('You feel anxious.')
     disallow_msg = ''
     disallow_msg
   }
-  obj.on_after_get = lambda { |world, player, object|
+  obj.on_after_move = lambda { |world, location, object|
+    return unless location.is_a?(Player)
+
+    player = location
     player.send('You are filled with a sense of forboding.') # send separately after the next prompt
   }
 

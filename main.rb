@@ -7,6 +7,7 @@ require_relative 'room'
 require_relative 'command'
 require_relative 'direction'
 require_relative 'events'
+require_relative 'npc'
 
 def repl(world, player)
   player.send_prompt # send initial prompt
@@ -56,7 +57,9 @@ def repl_eval(world, player, msg)
 
   # TODO: pass parameter for writing to user? or make send a member of world?
 
-  cmd.call(world, player, args)
+  world.lock.synchronize do
+    cmd.call(world, player, args)
+  end
   false
 ensure
   player.end_processing_and_send
@@ -102,16 +105,20 @@ player.add_item(cup)
 world_key = make_world_key(world)
 player.add_item(world_key)
 
+goblin = NPC.new(world.new_id, 'goblin', 'a pungent goblin', 'This goblin is quite rank.', true)
+player.add_item(goblin)
+
 # msg = look(world, player, ['look'])
 # puts "look: #{msg}"
 
-eq = EventQueue.new
-eq.start
+# eq = EventQueue.new
+# eq.start
 
 # debug
-# eq.add_event(Time.now + 5, -> { puts 'event-05' })
-# eq.add_event(Time.now + 10, -> { puts 'event-10' })
-# eq.add_event(Time.now + 7, -> { puts 'event-07' })
-# eq.add_event(Time.now + 2, -> { puts 'event-02' })
+# world.add_event(Time.now + 5, -> { puts 'event-05' })
+# world.add_event(Time.now + 10, -> { puts 'event-10' })
+# world.add_event(Time.now + 7, -> { puts 'event-07' })
+# world.add_event(Time.now + 2, -> { puts 'event-02' })
+# world.add_event(Time.now + 2, -> { puts 'event-01' })
 
 repl(world, player)
