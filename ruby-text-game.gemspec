@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
     'room.rb',
     'world.rb'
   ]
-  s.require_paths = ['lib']
+  spec.require_paths = ['lib']
   spec.summary = 'text game lib'
   spec.author = 'Robert O Butts'
 end
