@@ -28,6 +28,8 @@ module RubyTextGame
       # { player : []object }
       @player_objects = {}
 
+      @player_name_id = {} # player[name]id
+
       print("creating new world EventQueue\n")
       @event_queue = EventQueue.new
     end
@@ -47,6 +49,7 @@ module RubyTextGame
     def make_player(name, room)
       player = Player.new(@id_generator.get, name, room)
       @players[player.id] = player
+      @player_name_id[name] = player.id
       player
     end
 
