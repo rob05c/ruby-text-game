@@ -4,15 +4,16 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 3.4.1'
   spec.add_dependency 'algorithms', '~> 1.0'
   spec.files = [
-    'command.rb',
-    'direction.rb',
-    'events.rb',
-    'idgen.rb',
-    'npc.rb',
-    'object.rb',
-    'player.rb',
-    'room.rb',
-    'world.rb'
+    'lib/ruby-text-game.rb',
+    'lib/ruby-text-game/command.rb',
+    'lib/ruby-text-game/direction.rb',
+    'lib/ruby-text-game/events.rb',
+    'lib/ruby-text-game/idgen.rb',
+    'lib/ruby-text-game/npc.rb',
+    'lib/ruby-text-game/object.rb',
+    'lib/ruby-text-game/player.rb',
+    'lib/ruby-text-game/room.rb',
+    'lib/ruby-text-game/world.rb'
   ]
   spec.require_paths = ['lib']
   spec.summary = 'text game lib'
