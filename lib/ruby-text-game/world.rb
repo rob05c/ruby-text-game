@@ -50,6 +50,17 @@ module RubyTextGame
       player
     end
 
+    def get_player_by_id(id)
+      @players[id]
+    end
+
+    def get_player_by_name(name)
+      id = @player_name_id[name]
+      return nil if id.nil?
+
+      @players[id]
+    end
+
     def make_room(title, short_desc, long_desc)
       room = Room.new(@id_generator.get, title, short_desc, long_desc)
       @rooms[room.id] = room
