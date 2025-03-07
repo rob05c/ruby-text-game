@@ -96,6 +96,16 @@ module RubyTextGame
     player.send("#{room.title}\n\n#{room.short_desc}\n#{ris}\n#{rds}")
   end
 
+  def look_str(world, player, args)
+    room = player.room
+    ris = room_items_str(world, room)
+    rds = room_directions_str(world, room)
+
+    blue = "\033[0;34m"
+    reset = "\033[0m"
+    "#{blue}#{room.title}#{reset}\n\n#{room.short_desc}\n#{ris}\n#{rds}"
+  end
+
   def self.move(world, player, args)
     if args.length < 2
       player.send('Where do you want to go?')
