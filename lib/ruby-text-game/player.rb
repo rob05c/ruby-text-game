@@ -1,7 +1,7 @@
 module RubyTextGame
   class Player
     attr_reader :id, :name
-    attr_accessor :room, :health, :mana, :prompt_char, :carrying
+    attr_accessor :room, :health, :mana, :prompt_char, :carrying, :send_fn
 
     # send_queue is a list[string].
     #
@@ -206,7 +206,11 @@ module RubyTextGame
 
     # real_send actually sends msg to the player. This should only be used by send and end_processing, never called directly
     def real_send(msg)
-      print msg
+      if !@send_fn.nil?
+        @send_fn.call(msg)
+      else
+        print "DEBUG send player #{@name} offline: '#{msg}'"
+      end
     end
 
     # send_prompt sends the prompt to the player.

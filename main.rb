@@ -99,6 +99,9 @@ world.link_rooms(roomA, RubyTextGame::Direction::EAST, roomB)
 # puts "room id #{room.id} title '#{room.title}'"
 
 player = world.make_player('george', roomA)
+player.send_fn = lambda { |msg|
+  print msg
+}
 
 sword = RubyTextGame::Sword.new(world.new_id, 'a short sword', 'This is a very shiny sword.', 42)
 cup = RubyTextGame::GameObject.new(world.new_id, 'cup', 'an ornate silver cup', 'This cup is very ornate and silver.')
