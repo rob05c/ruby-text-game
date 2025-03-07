@@ -89,8 +89,7 @@ end
 class EventQueueObj
   include Comparable
 
-  attr_accessor :time
-  attr_accessor :fn
+  attr_accessor :time, :fn
 
   def initialize(time, fn)
     @time = time

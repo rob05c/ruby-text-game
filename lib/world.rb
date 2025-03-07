@@ -18,10 +18,12 @@ class World
     @lock = Mutex.new
 
     # TODO: make object containers
-    # map[object]room|player
-    # @objects_locations = {}
-    # @room_objects = {}
-    # @player_objects = {}
+    # { object : room|player }
+    @objects_locations = {}
+    # { room : object }
+    @room_objects = {}
+    # { player : []object }
+    @player_objects = {}
 
     @event_queue = EventQueue.new
     @event_queue.start # TODO: move to World.start ?

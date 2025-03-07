@@ -1,13 +1,13 @@
 #!/usr/bin/env -S ruby -w
 
-require_relative 'world'
-require_relative 'idgen'
-require_relative 'object'
-require_relative 'room'
-require_relative 'command'
-require_relative 'direction'
-require_relative 'events'
-require_relative 'npc'
+require_relative 'lib/world'
+require_relative 'lib/idgen'
+require_relative 'lib/object'
+require_relative 'lib/room'
+require_relative 'lib/command'
+require_relative 'lib/direction'
+require_relative 'lib/events'
+require_relative 'lib/npc'
 
 def repl(world, player)
   player.send_prompt # send initial prompt
@@ -18,8 +18,7 @@ def repl(world, player)
 end
 
 def read
-  txt = gets.chomp
-  txt
+  gets.chomp
 end
 
 # replEval handles user input. This is the 'eval' part of read-eval-print-loop.
@@ -88,7 +87,8 @@ puts "sword: #{attack_msg}"
 world = World.new
 
 roomA = Room.new(world.new_id, 'A small garden', "This garden isn't very large.", 'The garden smells like wildflowers')
-roomB = Room.new(world.new_id, 'A large kitchen', 'This kitchen is quite large. Pots hang on the walls, and something smells good.', 'The garden smells like wildflowers')
+roomB = Room.new(world.new_id, 'A large kitchen',
+                 'This kitchen is quite large. Pots hang on the walls, and something smells good.', 'The garden smells like wildflowers')
 
 world.link_rooms(roomA, Direction::EAST, roomB)
 
