@@ -96,7 +96,7 @@ module RubyTextGame
     player.send("#{room.title}\n\n#{room.short_desc}\n#{ris}\n#{rds}")
   end
 
-  def look_str(world, player, args)
+  def self.look_str(world, player, args)
     room = player.room
     ris = room_items_str(world, room)
     rds = room_directions_str(world, room)
