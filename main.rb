@@ -1,13 +1,14 @@
 #!/usr/bin/env -S ruby -w
 
-require_relative 'lib/world'
-require_relative 'lib/idgen'
-require_relative 'lib/object'
-require_relative 'lib/room'
-require_relative 'lib/command'
-require_relative 'lib/direction'
-require_relative 'lib/events'
-require_relative 'lib/npc'
+require 'bundler/inline'
+
+gemfile do
+  source 'https://rubygems.org'
+  # gem 'ruby-text-game', git: 'https://github.com/rob05c/ruby-text-game.git', tag: 'v0.0.4'
+  gem 'ruby-text-game', path: '.'
+end
+
+require 'ruby-text-game'
 
 def repl(world, player)
   player.send_prompt # send initial prompt
@@ -52,7 +53,7 @@ def repl_eval(world, player, msg)
     return true
   end
 
-  cmd = get_command(args)
+  cmd = RubyTextGame.get_command(args)
 
   # TODO: pass parameter for writing to user? or make send a member of world?
 
@@ -64,7 +65,7 @@ ensure
   player.end_processing_and_send
 end
 
-ii = IdGenerator.new
+ii = RubyTextGame::IdGenerator.new
 
 id = ii.get
 puts "id: #{id}"
@@ -72,40 +73,43 @@ puts "id: #{id}"
 id = ii.get
 puts "id: #{id}"
 
-world = World.new
+world = RubyTextGame::World.new
+world.Start
 
 puts "wid: #{world.new_id}"
 puts "wid: #{world.new_id}"
 puts "wid: #{world.new_id}"
 
-sword = Sword.new(42, 'a short sword', 'this sword is very short', 99)
+sword = RubyTextGame::Sword.new(42, 'a short sword', 'this sword is very short', 99)
 
 attack_msg = sword.attack_msg('you', 'a scrawny goblin')
 
 puts "sword: #{attack_msg}"
 
-world = World.new
+world = RubyTextGame::World.new
+world.Start
 
-roomA = Room.new(world.new_id, 'A small garden', "This garden isn't very large.", 'The garden smells like wildflowers')
-roomB = Room.new(world.new_id, 'A large kitchen',
-                 'This kitchen is quite large. Pots hang on the walls, and something smells good.', 'The garden smells like wildflowers')
+roomA = RubyTextGame::Room.new(world.new_id, 'A small garden', "This garden isn't very large.",
+                               'The garden smells like wildflowers')
+roomB = RubyTextGame::Room.new(world.new_id, 'A large kitchen',
+                               'This kitchen is quite large. Pots hang on the walls, and something smells good.', 'The garden smells like wildflowers')
 
-world.link_rooms(roomA, Direction::EAST, roomB)
+world.link_rooms(roomA, RubyTextGame::Direction::EAST, roomB)
 
 # puts "room id #{room.id} title '#{room.title}'"
 
 player = world.make_player('george', roomA)
 
-sword = Sword.new(world.new_id, 'a short sword', 'This is a very shiny sword.', 42)
-cup = Object.new(world.new_id, 'cup', 'an ornate silver cup', 'This cup is very ornate and silver.')
+sword = RubyTextGame::Sword.new(world.new_id, 'a short sword', 'This is a very shiny sword.', 42)
+cup = RubyTextGame::GameObject.new(world.new_id, 'cup', 'an ornate silver cup', 'This cup is very ornate and silver.')
 
 player.add_item(sword)
 player.add_item(cup)
 
-world_key = make_world_key(world)
+world_key = RubyTextGame.make_world_key(world)
 player.add_item(world_key)
 
-goblin = NPC.new(world.new_id, 'goblin', 'a pungent goblin', 'This goblin is quite rank.', true)
+goblin = RubyTextGame::NPC.new(world.new_id, 'goblin', 'a pungent goblin', 'This goblin is quite rank.', true)
 player.add_item(goblin)
 
 # msg = look(world, player, ['look'])

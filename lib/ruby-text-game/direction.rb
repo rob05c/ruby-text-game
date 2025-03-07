@@ -9,7 +9,7 @@ module RubyTextGame
     SOUTH_EAST = 'southeast'.freeze
     SOUTH_WEST = 'southwest'.freeze
 
-    def reverse_dir(dir)
+    def self.reverse_dir(dir)
       case dir
       when NORTH
         SOUTH
@@ -30,7 +30,7 @@ module RubyTextGame
       end
     end
 
-    def from_str(str)
+    def self.from_str(str)
       str = str.strip.downcase
       case str
       when 'n', 'north'

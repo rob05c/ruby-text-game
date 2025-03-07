@@ -1,5 +1,5 @@
 module RubyTextGame
-  class Object
+  class GameObject
     attr_accessor :id, :word, :brief_desc, :long_desc
 
     # on_before_move takes a (world, location, obj) and returns a disallow message string
@@ -33,7 +33,15 @@ module RubyTextGame
     player.send("You #{cmd} the #{@word}, but nothing seems to happen.")
   end
 
-  class Weapon < Object
+  # TODO: put in util func?
+  def titleize(str)
+    str.gsub(/\w+/) do |word|
+      word.capitalize
+    end
+  end
+
+  class Weapon < GameObject
+    include RubyTextGame
     def initialize(id, word, brief_desc, long_desc, damage, attack_msg_tpl)
       @damage = damage
       @attack_msg_tpl = attack_msg_tpl
@@ -54,16 +62,9 @@ module RubyTextGame
     end
   end
 
-  # TODO: put in util func?
-  def titleize(str)
-    str.gsub(/\w+/) do |word|
-      word.capitalize
-    end
-  end
-
   # creats a world key object, which lets the holder create rooms.
-  def make_world_key(world)
-    obj = Object.new(world.new_id, 'key', 'an unobtrusive key', 'This unremarkable key seems to be made of iron.')
+  def self.make_world_key(world)
+    obj = GameObject.new(world.new_id, 'key', 'an unobtrusive key', 'This unremarkable key seems to be made of iron.')
     obj.cmd = ->(world, player, args) { world_key_cmd(obj, world, player, args) }
 
     # world keys cannot be picked up off the ground
@@ -107,7 +108,7 @@ module RubyTextGame
   end
 
   # RoomItem is a room item, used to create new rooms via a world key.
-  class RoomItem < Object
+  class RoomItem < GameObject
     attr_accessor :room
 
     def initialize(id, world)

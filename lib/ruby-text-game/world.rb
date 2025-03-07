@@ -3,6 +3,10 @@ module RubyTextGame
   # require_relative 'player'
   # require_relative 'events'
 
+  ##
+  # Contains the entire game state.
+  # After creation, you must call Start to start the event queue and acquire any other resources.
+  # When finished with the world, Stop must be called to release resources.
   class World
     attr_accessor :rooms, :rand, :lock
 
@@ -24,12 +28,15 @@ module RubyTextGame
       # { player : []object }
       @player_objects = {}
 
+      print("creating new world EventQueue\n")
       @event_queue = EventQueue.new
-      @event_queue.start # TODO: move to World.start ?
-      ObjectSpace.define_finalizer(self, self.class.method(:finalize))
     end
 
-    def self.finalize
+    def Start
+      @event_queue.start # TODO: move to World.start ?
+    end
+
+    def Stop
       @event_queue.stop
     end
 
@@ -51,7 +58,7 @@ module RubyTextGame
 
     def link_rooms(roomA, direction, roomB)
       link_rooms_single(roomA, direction, roomB)
-      link_rooms_single(roomB, Direction.reverse_dir(direction), roomA)
+      link_rooms_single(roomB, RubyTextGame::Direction.reverse_dir(direction), roomA)
     end
 
     # Links roomA to roomB via direction.

@@ -1,7 +1,7 @@
 module RubyTextGame
   # require_relative 'object'
   # require_relative 'world'
-  class NPC < Object
+  class NPC < GameObject
     def initialize(id, word, brief_desc, long_desc, meander)
       @meander_interval_s = 5 # TODO: make configurable
       @on_after_move = method(:after_move) if meander

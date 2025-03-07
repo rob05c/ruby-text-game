@@ -1,9 +1,4 @@
 module RubyTextGame
-  # require 'rubygems'
-  # require 'algorithms'
-
-  include Containers
-
   ##
   # EventQueue handles queuing and executing events.
   # Events can be timed, e.g. an NPC that moves every N seconds,
@@ -18,7 +13,7 @@ module RubyTextGame
     def initialize
       # TODO: implement heap, remove dependency.
       #       A heap is a pretty simple thing to implement, not worth the cost of a dependency right now.
-      @heap = MinHeap.new
+      @heap = Containers::MinHeap.new
       @lock = Mutex.new
       @stop = false
       @thread = nil

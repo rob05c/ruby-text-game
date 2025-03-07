@@ -5,7 +5,7 @@ module RubyTextGame
 
   # If the player tried to do something that doesn't exist in their context,
   # unknownCommand is returned.
-  def get_command(args)
+  def self.get_command(args)
     return method(:no_command) if args.length == 0
 
     base_cmds = base_commands # TODO: cache? make Commands an object?
@@ -21,7 +21,7 @@ module RubyTextGame
     method(:unknown_command)
   end
 
-  def base_commands
+  def self.base_commands
     {
       'look' => method(:look),
       'l' => method(:look),
@@ -63,7 +63,7 @@ module RubyTextGame
     }
   end
 
-  def room_directions_str(world, room)
+  def self.room_directions_str(world, room)
     # TODO: move to room member var?
     links = world.get_room_links(room)
     return "You don't see any way out." if links.length == 0
@@ -76,7 +76,7 @@ module RubyTextGame
     "You see exits leading #{exit_strs.join(', ')}."
   end
 
-  def room_items_str(world, room)
+  def self.room_items_str(world, room)
     item_descs = []
     room.items.each do |item|
       # TODO: add ground desc to item
@@ -89,14 +89,14 @@ module RubyTextGame
     item_descs.join(' ')
   end
 
-  def look(world, player, args)
+  def self.look(world, player, args)
     room = player.room
     ris = room_items_str(world, room)
     rds = room_directions_str(world, room)
     player.send("#{room.title}\n\n#{room.short_desc}\n#{ris}\n#{rds}")
   end
 
-  def move(world, player, args)
+  def self.move(world, player, args)
     if args.length < 2
       player.send('Where do you want to go?')
       return
@@ -114,7 +114,7 @@ module RubyTextGame
 
   # go moves player in dir.
   # This is a utility func, not a command, i.e. it doesn't conform to func(world,player,args).
-  def go(world, player, direction)
+  def self.go(world, player, direction)
     room = player.room
 
     new_room = world.get_room_link(room, direction)
@@ -129,7 +129,7 @@ module RubyTextGame
     look(world, player, [])
   end
 
-  def drop(world, player, args)
+  def self.drop(world, player, args)
     if args.length < 2
       player.send('What do you want to drop?')
       return
@@ -155,7 +155,7 @@ module RubyTextGame
     player.drop(world, item)
   end
 
-  def get(world, player, args)
+  def self.get(world, player, args)
     if args.length < 2
       player.send('What do you want to get?')
       return
@@ -181,7 +181,7 @@ module RubyTextGame
     player.get(world, item)
   end
 
-  def inventory(world, player, args)
+  def self.inventory(world, player, args)
     item_strs = []
     player.carrying.each do |item|
       item_strs.push(item.brief_desc)
@@ -195,18 +195,18 @@ module RubyTextGame
   # In which case, we don't send them anything, just another prompt.
 
   # This is distinct from the player entering an unknown command.
-  def no_command(world, player, args)
+  def self.no_command(world, player, args)
     nil
   end
 
-  def unknown_command(world, player, args)
+  def self.unknown_command(world, player, args)
     player.send('What was that now?')
   end
 
   # interaction is a generic command for interaction commands with objects:
   # push, pull, poke, etc.
   # It searches the player's inventory, then the room, for items with the given word.
-  def interaction(world, player, args)
+  def self.interaction(world, player, args)
     verb = args[0].strip.downcase
     if args.length < 2
       player.send("What do you want to #{verb}?")
