@@ -191,6 +191,16 @@ module RubyTextGame
     player.send("You are carrying #{item_str}.")
   end
 
+  def self.inventory_str(world, player, args)
+    item_strs = []
+    player.carrying.each do |item|
+      item_strs.push(item.brief_desc)
+    end
+
+    item_str = item_strs.join(', ')
+    "You are carrying #{item_str}."
+  end
+
   # no_command is used when the player sends just a return or whitespace.
   # In which case, we don't send them anything, just another prompt.
 
