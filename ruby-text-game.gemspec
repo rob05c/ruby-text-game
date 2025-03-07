@@ -3,7 +3,7 @@ Gem::Specification.new do |spec|
   spec.version = '0.0.1'
   spec.required_ruby_version = '>= 3.4.1'
   spec.add_dependency 'algorithms', '~> 1.0'
-  s.files = [
+  spec.files = [
     'command.rb',
     'direction.rb',
     'events.rb',
