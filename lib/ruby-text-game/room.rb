@@ -1,5 +1,4 @@
 module RubyTextGame
-  # require_relative 'object'
   class Room
     attr_reader :id
     attr_accessor :title, :short_desc, :long_desc, :items

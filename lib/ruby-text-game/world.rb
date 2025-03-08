@@ -1,8 +1,4 @@
 module RubyTextGame
-  # require_relative 'idgen'
-  # require_relative 'player'
-  # require_relative 'events'
-
   ##
   # Contains the entire game state.
   # After creation, you must call Start to start the event queue and acquire any other resources.

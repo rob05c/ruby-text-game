@@ -1,6 +1,6 @@
 module RubyTextGame
-  # require_relative 'direction'
-  # require 'test/unit'
+  require_relative 'direction'
+  require 'test/unit'
 
   include Direction
 

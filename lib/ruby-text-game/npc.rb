@@ -1,6 +1,4 @@
 module RubyTextGame
-  # require_relative 'object'
-  # require_relative 'world'
   class NPC < GameObject
     def initialize(id, word, brief_desc, long_desc, meander)
       @meander_interval_s = 5 # TODO: make configurable
