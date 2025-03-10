@@ -73,21 +73,22 @@ puts "id: #{id}"
 id = ii.get
 puts "id: #{id}"
 
+puts 'Running world.'
+RubyTextGame::World.run do |world|
+  puts "wid: #{world.new_id}"
+  puts "wid: #{world.new_id}"
+  puts "wid: #{world.new_id}"
+
+  sword = RubyTextGame::Sword.new(42, 'a short sword', 'this sword is very short', 99)
+
+  attack_msg = sword.attack_msg('you', 'a scrawny goblin')
+
+  puts "sword: #{attack_msg}"
+end
+puts 'Ran world.'
+
 world = RubyTextGame::World.new
-world.Start
-
-puts "wid: #{world.new_id}"
-puts "wid: #{world.new_id}"
-puts "wid: #{world.new_id}"
-
-sword = RubyTextGame::Sword.new(42, 'a short sword', 'this sword is very short', 99)
-
-attack_msg = sword.attack_msg('you', 'a scrawny goblin')
-
-puts "sword: #{attack_msg}"
-
-world = RubyTextGame::World.new
-world.Start
+world.start
 
 roomA = RubyTextGame::Room.new(world.new_id, 'A small garden', "This garden isn't very large.",
                                'The garden smells like wildflowers')

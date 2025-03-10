@@ -86,7 +86,7 @@ module RubyTextGame
     obj
   end
 
-  def world_key_cmd(key, world, player, args)
+  def self.world_key_cmd(key, world, player, args)
     verb = args[0].strip.downcase
 
     player_is_carrying = player.carrying?(key)
@@ -170,7 +170,7 @@ module RubyTextGame
       desc = args.slice(2, args.length)
       desc = desc.join(' ').strip
 
-      # puts "DEBUG roc '#{@room.title}' '#{@room.short_desc}' '#{@room.long_desc}'"
+      world.logger.debug "roc '#{@room.title}' '#{@room.short_desc}' '#{@room.long_desc}'"
 
       if @room.title == ''
         @room.title = desc
@@ -187,7 +187,7 @@ module RubyTextGame
     end
   end
 
-  def make_room_obj(world)
+  def self.make_room_obj(world)
     RoomItem.new(world.new_id, world)
   end
 end

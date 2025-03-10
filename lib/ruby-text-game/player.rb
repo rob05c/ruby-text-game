@@ -1,7 +1,7 @@
 module RubyTextGame
   class Player
     attr_reader :id, :name
-    attr_accessor :room, :health, :mana, :prompt_char, :carrying, :send_fn
+    attr_accessor :room, :world, :health, :mana, :prompt_char, :carrying, :send_fn
 
     # send_queue is a list[string].
     #
@@ -39,8 +39,9 @@ module RubyTextGame
     attr_accessor :processing
     alias processing? processing
 
-    def initialize(id, name, room)
+    def initialize(id, world, name, room)
       @id = id
+      @world = world
       @room = room
       @health = 100
       @mana = 100
@@ -162,8 +163,7 @@ module RubyTextGame
 
     # Sends msg to the player.
     #
-    # Right now, this just prints. But we want to be able to easily find + replace
-    # all user prints in the future, e.g. to support multiple users, telnet, ssh, etc.
+    # Sends via the player's send_fn. If send_fn is not set, it's assumed the player is offline, and an info is logged.
     #
     # Does not automatically send a newline, to allow for prompts. Most calls besides prompts should send a newline
     def send(msg)
@@ -209,14 +209,14 @@ module RubyTextGame
       if !@send_fn.nil?
         @send_fn.call(msg)
       else
-        print "DEBUG send player #{@name} offline: '#{msg}'"
+        @world.logger.debug "send player #{@name} offline: '#{msg}'"
       end
     end
 
     # send_prompt sends the prompt to the player.
     # This should generally only be called by send_queue, or if the player hit enter without sending text.
     def send_prompt
-      print prompt
+      real_send(prompt)
     end
   end
 end

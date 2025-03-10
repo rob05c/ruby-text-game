@@ -1,13 +1,23 @@
 module RubyTextGame
   ##
   # Contains the entire game state.
-  # After creation, you must call Start to start the event queue and acquire any other resources.
-  # When finished with the world, Stop must be called to release resources.
+  # After creation, you must call start to start the event queue and acquire any other resources.
+  # When finished with the world, stop must be called to release resources.
+  #
+  # Logging defaults to Rails.logger if it exists, else STDOUT at debug level.
+  # To change, change the exposed @logger. E.g. `myWorld.logger.level = Logger::ERROR`.
   class World
-    attr_accessor :rooms, :rand, :lock
+    attr_accessor :rooms, :rand, :lock, :logger
 
     def initialize
-      print("creating new world\n")
+      @logger = defined?(Rails) ? Rails.logger : Logger.new(STDOUT)
+
+      # Note nothing should be logged within initialize.
+      # This is because users may want to immediately change the logger.
+      #
+      # If something needs to be logged here, we should either move it to start,
+      # or change initialize to take the logger as an argument.
+
       @id_generator = IdGenerator.new
       @players = {}
       @rooms = {}
@@ -26,15 +36,26 @@ module RubyTextGame
 
       @player_name_id = {} # player[name]id
 
-      print("creating new world EventQueue\n")
       @event_queue = EventQueue.new
     end
 
-    def Start
-      @event_queue.start # TODO: move to World.start ?
+    ##
+    # Acts like File.open: creates a new World with the given args,
+    # calls World.start, yields to a block, then calls World.stop.
+    def self.run(*args)
+      world = new(*args)
+      world.start
+      yield world
+      world.stop
     end
 
-    def Stop
+    def start
+      logger.info 'World.start'
+      @event_queue.start
+    end
+
+    def stop
+      logger.info 'World.stop'
       @event_queue.stop
     end
 
@@ -43,7 +64,7 @@ module RubyTextGame
     end
 
     def make_player(name, room)
-      player = Player.new(@id_generator.get, name, room)
+      player = Player.new(@id_generator.get, self, name, room)
       @players[player.id] = player
       @player_name_id[name] = player.id
       player

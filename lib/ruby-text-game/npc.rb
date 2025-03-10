@@ -8,7 +8,7 @@ module RubyTextGame
     end
 
     def after_move(world, location, object)
-      # puts "DEBUG after_move #{id} #{word}"
+      world.logger.debug "after_move #{id} #{word}"
       return unless location.is_a?(Room)
 
       world.add_event(Time.now + @meander_interval_s, lambda {

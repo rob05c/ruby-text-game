@@ -61,8 +61,6 @@ module RubyTextGame
         # fire after unlocking, so the call takes place without holding the EventQueue lock
         event_to_fire.fn.call # will be nil if synchronize block called next
       end
-
-      puts 'hello from thread'
     end
 
     ##

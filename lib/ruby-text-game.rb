@@ -1,4 +1,5 @@
 module RubyTextGame
+  require 'logger'
   require 'algorithms'
   require 'ruby-text-game/direction'
   require 'ruby-text-game/command'
